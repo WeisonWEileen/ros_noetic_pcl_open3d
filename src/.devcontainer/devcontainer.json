@@ -1,0 +1,52 @@
+{
+    "name": "R2_open_cv_ros2",
+    "privileged": true,
+    "initializeCommand": "ls",
+    "remoteUser": "focal",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": {
+            "USERNAME": "focal"
+        }
+    },
+    "workspaceFolder": "/home/ws",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/ws/src,type=bind",
+    "customizations": {
+        "vscode": {
+            "extensions":[
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-themes",
+                "twxs.cmake",            //necessary for cmake for vscode               
+                "ms-vscode.cmake-tools",                 //necessary for cmake for vscode
+                "donjayamanne.python-extension-pack",    //make code look beartiful
+                "eamodio.gitlens",                       
+                "ms-iot.vscode-ros",                    //to debug ros node
+                "batisteo.vscode-django",
+                "github.copilot",               //to help you code
+                "ms-python.python",
+                "ms-azuretools.vscode-docker"    //docker support 
+            ]
+        }
+    },
+    "containerEnv": {
+        "DISPLAY": "unix:0",
+        "ROS_AUTOMATIC_DISCOVERY_RANGE": "LOCALHOST",
+        "ROS_DOMAIN_ID": "42"
+    },
+    "runArgs": [
+        "--net=host",
+        // "-e", "DISPLAY=${env:DISPLAY}",
+        "-e"," DISPLAY=unix$DISPLAY", //docker wsl2
+        "--gpus", "all",
+        "-e"," GDK_SCALE",  //docker wsl2
+        "-e","GDK_DPI_SCALE"  //docker wsl2
+    ],
+    "mounts": [
+       "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached",
+        "source=/dev,target=/dev,type=bind,consistency=cached",
+          "source=${localWorkspaceFolder}/../cache/noetic/build,target=/home/ws/build,type=bind",
+        "source=${localWorkspaceFolder}/../cache/noetic/devel,target=/home/ws/devel,type=bind"
+        // "source=${localWorkspaceFolder}/../cache/humble/log,target=/home/ws/log,type=bind"
+    ],
+    "postCreateCommand": "rosdep update && rosdep install --from-paths src --ignore-src -y && sudo chown -R $(whoami) /home/ws/"
+}
